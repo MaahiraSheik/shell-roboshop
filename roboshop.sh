@@ -6,7 +6,7 @@ INSTANCES=("mangodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipp
 ZONE_ID="Z068958217B8R8Q4GDM1O"
 DOMAIN_NAME="miasha84s.site"
 
-for instaces in ${INSTANCES[@]}
+for instance in ${INSTANCES[@]}
 do
 
 INSTANCE_ID=$(aws ec2 run-instances \
