@@ -2,7 +2,8 @@
 
 AMI_ID="ami-09c813fb71547fc4f"
 SG_ID="sg-0f5223df757c2d0ea"
-INSTANCES=("mangodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "dispatch" "frontend")
+#INSTANCES=("mangodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "dispatch" "frontend")
+INSTANCES=("mangodb" "redis" "mysql")
 ZONE_ID="Z068958217B8R8Q4GDM1O"
 DOMAIN_NAME="miasha84s.site"
 
