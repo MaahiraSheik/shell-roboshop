@@ -69,7 +69,7 @@ INSTANCE_IP=$(aws ec2 describe-instances \
         "Type": "A",
         "TTL": 1,
         "ResourceRecords": [{
-          "Value": "'"$IP"'"
+          "Value": "" $IP ""
         }]
       }
     }]
