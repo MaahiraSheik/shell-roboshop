@@ -7,26 +7,6 @@ INSTANCES=("mangodb"  "frontend")
 ZONE_ID="Z03411543BSLBE0GBV4TS"
 DOMAIN_NAME="miasha84s.site"
 
-for instance in "${INSTANCES[@]}"
-do
-  # Launch instance and capture ID
-  INSTANCE_ID=$(aws ec2 run-instances \
-    --image-id ami-09c813fb71547fc4f \
-    --instance-type t3.micro \
-    --security-group-ids sg-074bbf13eb04da445 \
-    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$instance}]" \
-    --query "Instances[0].InstanceId" \
-    --output text)
-for instance in "${INSTANCES[@]}"
-do
-  INSTANCE_ID=$(aws ec2 run-instances \
-    --image-id ami-09c813fb71547fc4f \
-    --instance-type t3.micro \
-    --security-group-ids sg-074bbf13eb04da445 \
-    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$instance}]" \
-    --query "Instances[0].InstanceId" \
-    --output text)
-
   # Wait until instance is running
   aws ec2 wait instance-running --instance-ids "$INSTANCE_ID"
 
@@ -60,5 +40,5 @@ do
         }
       }]
     }"
-    
+
 done
