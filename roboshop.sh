@@ -1,44 +1,47 @@
 #!/bin/bash
 
+# AMI_ID="ami-09c813fb71547fc4f"
+# SG_ID="sg-074bbf13eb04da445"
+# #INSTANCES=("mangodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "dispatch" "frontend")
+# INSTANCES=("mangodb"  "frontend")
+# ZONE_ID="Z03411543BSLBE0GBV4TS"
+# DOMAIN_NAME="miasha84s.site"
+
 AMI_ID="ami-09c813fb71547fc4f"
-SG_ID="sg-074bbf13eb04da445"
-#INSTANCES=("mangodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "dispatch" "frontend")
-INSTANCES=("mangodb"  "frontend")
-ZONE_ID="Z03411543BSLBE0GBV4TS"
-DOMAIN_NAME="miasha84s.site"
+SG_ID="sg-074bbf13eb04da445" # replace with your SG ID
+INSTANCES=("mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "dispatch" "frontend")
+ZONE_ID="Z03411543BSLBE0GBV4TS" # replace with your ZONE ID
+DOMAIN_NAME="miasha84s.site" # replace with your domain
 
-  # Wait until instance is running
-  aws ec2 wait instance-running --instance-ids "$INSTANCE_ID"
+#for instance in ${INSTANCES[@]}
+for instance in $@
+do
+    INSTANCE_ID=$(aws ec2 run-instances --image-id ami-09c813fb71547fc4f --instance-type t3.micro --security-group-ids sg-074bbf13eb04da445 --tag-specifications "ResourceType=instance,Tags=[{Key=Name, Value=$instance}]" --query "Instances[0].InstanceId" --output text)
+    if [ $instance != "frontend" ]
+    then
+        IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[0].Instances[0].PrivateIpAddress" --output text)
+        RECORD_NAME="$instance.$DOMAIN_NAME"
+    else
+        IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
+        RECORD_NAME="$DOMAIN_NAME"
+    fi
+    echo "$instance IP address: $IP"
 
-  if [ "$instance" != "frontend" ]; then
-    INSTANCE_IP=$(aws ec2 describe-instances \
-      --instance-ids "$INSTANCE_ID" \
-      --query "Reservations[0].Instances[0].PrivateIpAddress" \
-      --output text)
-    RECORD_NAME="$instance.$DOMAIN_NAME"
-  else
-    INSTANCE_IP=$(aws ec2 describe-instances \
-      --instance-ids "$INSTANCE_ID" \
-      --query "Reservations[0].Instances[0].PublicIpAddress" \
-      --output text)
-    RECORD_NAME="$DOMAIN_NAME"
-  fi
-
-  echo "$instance IP address: $INSTANCE_IP"
-
-  aws route53 change-resource-record-sets \
-    --hosted-zone-id "$ZONE_ID" \
-    --change-batch "{
-      \"Comment\": \"Creating or Updating a record set for $instance\",
-      \"Changes\": [{
-        \"Action\": \"UPSERT\",
-        \"ResourceRecordSet\": {
-          \"Name\": \"$RECORD_NAME\",
-          \"Type\": \"A\",
-          \"TTL\": 300,
-          \"ResourceRecords\": [{\"Value\": \"$INSTANCE_IP\"}]
+    aws route53 change-resource-record-sets \
+    --hosted-zone-id $ZONE_ID \
+    --change-batch '
+    {
+        "Comment": "Creating or Updating a record set for cognito endpoint"
+        ,"Changes": [{
+        "Action"              : "UPSERT"
+        ,"ResourceRecordSet"  : {
+            "Name"              : "'$RECORD_NAME'"
+            ,"Type"             : "A"
+            ,"TTL"              : 1
+            ,"ResourceRecords"  : [{
+                "Value"         : "'$IP'"
+            }]
         }
-      }]
-    }"
-
+        }]
+    }'
 done
