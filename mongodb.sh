@@ -59,7 +59,7 @@ VALIDATE(){
 #         echo -e "$2 is ... $R FAILURE $N" | tee -a $LOG_FILE
 #         exit 1
 #     fi
-# }
+}
 
 
 # cp mongo.repo /etc/yum.repos.d/mongodb.repo
