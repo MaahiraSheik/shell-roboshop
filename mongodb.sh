@@ -30,19 +30,37 @@ VALIDATE(){
 
 }
 
-cp mongo.repo /etc/yum.repos.d/mongodb.repo &>>$LOG_FILE
-VALIDATE $? "copying mongodb repo"
+cp mongo.repo /etc/yum.repos.d/mongodb.repo
+VALIDATE $? "Copying MongoDB repo"
 
-dnf install -y mongodb-org &>>$LOG_FILE
-VALIDATE $? "install mongodb"
+dnf install mongodb-org -y &>>$LOG_FILE
+VALIDATE $? "Installing mongodb server"
 
 systemctl enable mongod &>>$LOG_FILE
-VALIDATE $? "enable Mongodb service"
-systemctl start mongod &>>$LOG_FILE
-VALIDATE $? "strat Mongodb service"
+VALIDATE $? "Enabling MongoDB"
 
-sed -i -e 's/127.0.0.1 to 0.0.0.0/g' /etc/mongod.conf
-VALIDATE $? "Editing mongodb conf file for remote connections"
+systemctl start mongod &>>$LOG_FILE
+VALIDATE $? "Starting MongoDB"
+
+sed -i 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf
+VALIDATE $? "Editing MongoDB conf file for remote connections"
 
 systemctl restart mongod &>>$LOG_FILE
-VALIDATE $? "restart mongodb"
+VALIDATE $? "Restarting MongoDB"
+
+# cp mongo.repo /etc/yum.repos.d/mongodb.repo &>>$LOG_FILE
+# VALIDATE $? "copying mongodb repo"
+
+# dnf install -y mongodb-org &>>$LOG_FILE
+# VALIDATE $? "install mongodb"
+
+# systemctl enable mongod &>>$LOG_FILE
+# VALIDATE $? "enable Mongodb service"
+# systemctl start mongod &>>$LOG_FILE
+# VALIDATE $? "strat Mongodb service"
+
+# sed -i -e 's/127.0.0.1 to 0.0.0.0/g' /etc/mongod.conf
+# VALIDATE $? "Editing mongodb conf file for remote connections"
+
+# systemctl restart mongod &>>$LOG_FILE
+# VALIDATE $? "restart mongodb"
