@@ -3,13 +3,13 @@
 # AMI_ID="ami-09c813fb71547fc4f"
 # SG_ID="sg-074bbf13eb04da445"
 # #INSTANCES=("mangodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "dispatch" "frontend")
- INSTANCES=("mongodb")
+ #INSTANCES=("mongodb")
 # ZONE_ID="Z03411543BSLBE0GBV4TS"
 # DOMAIN_NAME="miasha84s.site"
 
 AMI_ID="ami-09c813fb71547fc4f"
 SG_ID="sg-074bbf13eb04da445" # replace with your SG ID
-INSTANCES=("dispatch" "frontend")
+INSTANCES=("mongodb")
 ZONE_ID="Z03411543BSLBE0GBV4TS" # replace with your ZONE ID
 DOMAIN_NAME="miasha84s.site" # replace with your domain
 
