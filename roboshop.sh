@@ -17,8 +17,19 @@ do
     --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$instance}]" \
     --query "Instances[0].InstanceId" \
     --output text)
+for instance in "${INSTANCES[@]}"
+do
+  INSTANCE_ID=$(aws ec2 run-instances \
+    --image-id ami-09c813fb71547fc4f \
+    --instance-type t3.micro \
+    --security-group-ids sg-074bbf13eb04da445 \
+    --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$instance}]" \
+    --query "Instances[0].InstanceId" \
+    --output text)
 
-  # Fetch IP depending on role
+  # Wait until instance is running
+  aws ec2 wait instance-running --instance-ids "$INSTANCE_ID"
+
   if [ "$instance" != "frontend" ]; then
     INSTANCE_IP=$(aws ec2 describe-instances \
       --instance-ids "$INSTANCE_ID" \
@@ -35,7 +46,6 @@ do
 
   echo "$instance IP address: $INSTANCE_IP"
 
-  # Update Route53 record
   aws route53 change-resource-record-sets \
     --hosted-zone-id "$ZONE_ID" \
     --change-batch "{
