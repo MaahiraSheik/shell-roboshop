@@ -91,7 +91,7 @@ VALIDATE $? "enable Mongodb service"
 systemctl start mongod &>>$LOG_FILE
 VALIDATE $? "strat Mongodb service"
 
-sed -i -e 's/127.0.0.1 to 0.0.0.0/g' /etc/mongod.conf
+sed -i -e 's/127.0.0.1/0.0.0.0/g' /etc/mongod.conf
 VALIDATE $? "Editing mongodb conf file for remote connections"
 
 systemctl restart mongod &>>$LOG_FILE
