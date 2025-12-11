@@ -58,21 +58,21 @@ INSTANCE_IP=$(aws ec2 describe-instances \
     #Print the instance name and its IP.
     echo "$instance ip address: $INSTANCE_IP"
 
-   aws route53 change-resource-record-sets \
+aws route53 change-resource-record-sets \
   --hosted-zone-id "$ZONE_ID" \
-  --change-batch '{
-    "Comment": "Creating a record set for roboshop service",
-    "Changes": [{
-      "Action": "UPSERT",
-      "ResourceRecordSet": {
-        "Name": "'"$instance.$DOMAIN_NAME"'",
-        "Type": "A",
-        "TTL": 60,
-        "ResourceRecords": [{
-          "Value": "'"$IP"'"
+  --change-batch "{
+    \"Comment\": \"Creating a record set for roboshop service\",
+    \"Changes\": [{
+      \"Action\": \"UPSERT\",
+      \"ResourceRecordSet\": {
+        \"Name\": \"${instance}.${DOMAIN_NAME}\",
+        \"Type\": \"A\",
+        \"TTL\": 60,
+        \"ResourceRecords\": [{
+          \"Value\": \"${IP}\"
         }]
       }
     }]
-  }'
+  }"
 
 done 
