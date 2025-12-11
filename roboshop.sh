@@ -4,8 +4,8 @@ AMI_ID="ami-09c813fb71547fc4f"
 SG_ID="sg-074bbf13eb04da445"
 #INSTANCES=("mangodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "dispatch" "frontend")
 INSTANCES=("mangodb" "redis" "mysql")
-ZONE_ID="Z03411543BSLBE0GBV4TS"
-DOMAIN_NAME="miasha84s.site"
+#ZONE_ID="Z03411543BSLBE0GBV4TS"
+#DOMAIN_NAME="miasha84s.site"
 
 #- ${INSTANCES[@]} expands to all elements of the array.
 #- The for loop takes each element one by one and assigns it to the variable instance
@@ -31,7 +31,7 @@ DOMAIN_NAME="miasha84s.site"
 # - Print the service name and IP.
 
 
-for instance in ${ INSTANCES[@] }
+for instance in ${INSTANCES[@]}
 do
 #- An Instance ID is a unique identifier automatically assigned by AWS to every EC2 instance you launch.
 
