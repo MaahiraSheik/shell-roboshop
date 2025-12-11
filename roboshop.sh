@@ -31,11 +31,59 @@ DOMAIN_NAME="miasha84s.site"
 # - Print the service name and IP.
 
 
-for instance in ${INSTANCES[@]}
-do
-#- An Instance ID is a unique identifier automatically assigned by AWS to every EC2 instance you launch.
+# for instance in ${INSTANCES[@]}
+# do
+# #- An Instance ID is a unique identifier automatically assigned by AWS to every EC2 instance you launch.
 
-INSTANCE_ID=$(aws ec2 run-instances \
+# INSTANCE_ID=$(aws ec2 run-instances \
+#     --image-id ami-09c813fb71547fc4f \
+#     --instance-type t3.micro \
+#     --security-group-ids sg-074bbf13eb04da445 \
+#     --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=$instance}]" \
+#     --query "Instances[0].InstanceId" \
+#     --output text)
+
+#     #- If the instance name is not "frontend", you fetch its private IP; otherwise, you fetch its public IP.
+
+# if [ $instance != "frontend" ]
+# then 
+# INSTANCE_IP=$(aws ec2 describe-instances \
+#     --instance-ids $INSTANCE_ID \
+#     --query "Reservations[0].Instances[0].PrivateIpAddress" --output text)
+#     RECORD_NAME="$instance.$DOMAIN_NAME"
+#     else
+#     INSTANCE_IP=$(aws ec2 describe-instances \
+#     --instance-ids $INSTANCE_ID \
+#     --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
+#     RECORD_NAME="$DOMAIN_NAME"
+#     fi
+#     #Print the instance name and its IP.
+#     echo "$instance ip address: $INSTANCE_IP"
+
+# aws route53 change-resource-record-sets \
+#     --hosted-zone-id $ZONE_ID \
+#     --change-batch '
+#     {
+#         "Comment": "Creating or Updating a record set for cognito endpoint"
+#         ,"Changes": [{
+#         "Action"              : "UPSERT"
+#         ,"ResourceRecordSet"  : {
+#             "Name"              : "'$RECORD_NAME'"
+#             ,"Type"             : "A"
+#             ,"TTL"              : 1
+#             ,"ResourceRecords"  : [{
+#                 "Value"         : "'$IP'"
+#             }]
+#         }
+#         }]
+#     }'
+
+# done 
+
+for instance in "${INSTANCES[@]}"
+do
+  # Launch instance and capture ID
+  INSTANCE_ID=$(aws ec2 run-instances \
     --image-id ami-09c813fb71547fc4f \
     --instance-type t3.micro \
     --security-group-ids sg-074bbf13eb04da445 \
@@ -43,39 +91,36 @@ INSTANCE_ID=$(aws ec2 run-instances \
     --query "Instances[0].InstanceId" \
     --output text)
 
-    #- If the instance name is not "frontend", you fetch its private IP; otherwise, you fetch its public IP.
-
-if [ $instance != "frontend" ]
-then 
-INSTANCE_IP=$(aws ec2 describe-instances \
-    --instance-ids $INSTANCE_ID \
-    --query "Reservations[0].Instances[0].PrivateIpAddress" --output text)
-    RECORD_NAME="$instance.$DOMAIN_NAME"
-    else
+  # Fetch IP depending on role
+  if [ "$instance" != "frontend" ]; then
     INSTANCE_IP=$(aws ec2 describe-instances \
-    --instance-ids $INSTANCE_ID \
-    --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
+      --instance-ids "$INSTANCE_ID" \
+      --query "Reservations[0].Instances[0].PrivateIpAddress" \
+      --output text)
+    RECORD_NAME="$instance.$DOMAIN_NAME"
+  else
+    INSTANCE_IP=$(aws ec2 describe-instances \
+      --instance-ids "$INSTANCE_ID" \
+      --query "Reservations[0].Instances[0].PublicIpAddress" \
+      --output text)
     RECORD_NAME="$DOMAIN_NAME"
-    fi
-    #Print the instance name and its IP.
-    echo "$instance ip address: $INSTANCE_IP"
+  fi
 
-aws route53 change-resource-record-sets \
-    --hosted-zone-id $ZONE_ID \
-    --change-batch '
-    {
-        "Comment": "Creating or Updating a record set for cognito endpoint"
-        ,"Changes": [{
-        "Action"              : "UPSERT"
-        ,"ResourceRecordSet"  : {
-            "Name"              : "'$RECORD_NAME'"
-            ,"Type"             : "A"
-            ,"TTL"              : 1
-            ,"ResourceRecords"  : [{
-                "Value"         : "'$IP'"
-            }]
+  echo "$instance IP address: $INSTANCE_IP"
+
+  # Update Route53 record
+  aws route53 change-resource-record-sets \
+    --hosted-zone-id "$ZONE_ID" \
+    --change-batch "{
+      \"Comment\": \"Creating or Updating a record set for $instance\",
+      \"Changes\": [{
+        \"Action\": \"UPSERT\",
+        \"ResourceRecordSet\": {
+          \"Name\": \"$RECORD_NAME\",
+          \"Type\": \"A\",
+          \"TTL\": 300,
+          \"ResourceRecords\": [{\"Value\": \"$INSTANCE_IP\"}]
         }
-        }]
-    }'
-
-done 
+      }]
+    }"
+done
