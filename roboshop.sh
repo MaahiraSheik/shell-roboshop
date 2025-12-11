@@ -4,8 +4,8 @@ AMI_ID="ami-09c813fb71547fc4f"
 SG_ID="sg-074bbf13eb04da445"
 #INSTANCES=("mangodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "dispatch" "frontend")
 INSTANCES=("mangodb" "redis" "mysql")
-#ZONE_ID="Z03411543BSLBE0GBV4TS"
-#DOMAIN_NAME="miasha84s.site"
+ZONE_ID="Z03411543BSLBE0GBV4TS"
+DOMAIN_NAME="miasha84s.site"
 
 #- ${INSTANCES[@]} expands to all elements of the array.
 #- The for loop takes each element one by one and assigns it to the variable instance
@@ -57,4 +57,23 @@ INSTANCE_IP=$(aws ec2 describe-instances \
     fi
     #Print the instance name and its IP.
     echo "$instance ip address: $INSTANCE_IP"
+
+    aws route53 change-resource-record-sets \
+  --hosted-zone-id $ZONE_ID \
+  --change-batch '
+  {
+    "Comment": "Creating a record set for cognito endpoint"
+    ,"Changes": [{
+      "Action"              : "UPSERT"
+      ,"ResourceRecordSet"  : {
+        "Name"              : "'$instance'.'$DOMAIN_NAME'"
+        ,"Type"             : "A"
+        ,"TTL"              : 1
+        ,"ResourceRecords"  : [{
+            "Value"         : "'$IP'"
+        }]
+      }
+    }]
+  }
+
 done 
