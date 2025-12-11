@@ -50,29 +50,32 @@ then
 INSTANCE_IP=$(aws ec2 describe-instances \
     --instance-ids $INSTANCE_ID \
     --query "Reservations[0].Instances[0].PrivateIpAddress" --output text)
+    RECORD_NAME="$instance.$DOMAIN_NAME"
     else
     INSTANCE_IP=$(aws ec2 describe-instances \
     --instance-ids $INSTANCE_ID \
     --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
+    RECORD_NAME="$DOMAIN_NAME"
     fi
     #Print the instance name and its IP.
     echo "$instance ip address: $INSTANCE_IP"
 
 aws route53 change-resource-record-sets \
-  --hosted-zone-id "$ZONE_ID" \
-  --change-batch "{
-    \"Comment\": \"Creating a record set for roboshop service\",
-    \"Changes\": [{
-      \"Action\": \"UPSERT\",
-      \"ResourceRecordSet\": {
-        \"Name\": \"${instance}.${DOMAIN_NAME}\",
-        \"Type\": \"A\",
-        \"TTL\": 60,
-        \"ResourceRecords\": [{
-          \"Value\": \"${IP}\"
+    --hosted-zone-id $ZONE_ID \
+    --change-batch '
+    {
+        "Comment": "Creating or Updating a record set for cognito endpoint"
+        ,"Changes": [{
+        "Action"              : "UPSERT"
+        ,"ResourceRecordSet"  : {
+            "Name"              : "'$RECORD_NAME'"
+            ,"Type"             : "A"
+            ,"TTL"              : 1
+            ,"ResourceRecords"  : [{
+                "Value"         : "'$IP'"
+            }]
+        }
         }]
-      }
-    }]
-  }""
+    }'
 
 done 
