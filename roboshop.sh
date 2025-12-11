@@ -31,7 +31,7 @@ DOMAIN_NAME="miasha84s.site"
 # - Print the service name and IP.
 
 
-for instance in ${INSTANCES[@]}
+for instance in ${ INSTANCES[@] }
 do
 #- An Instance ID is a unique identifier automatically assigned by AWS to every EC2 instance you launch.
 
