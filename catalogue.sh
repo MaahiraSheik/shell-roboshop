@@ -48,7 +48,7 @@ echo -e "system user roboshop already created...$YSKIPPING..$N"
 fi
 
 mkdir -p /app &>>LOG_FILE
-VALIDATE $? "createing App directory"
+VALIDATE $? "creating App directory"
 
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip 
 VALIDATE $? "Downloading the catalogue"
