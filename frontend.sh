@@ -43,7 +43,7 @@ VALIDATE $? "installing nginx"
 systemctl enable nginx &>>LOG_FILE
 VALIDATE $? "sytemctl enable nginx"
 systemctl start nginx &>>LOG_FILE
-VALIDATE $? "instsustemctl disable start nginx"
+VALIDATE $? "start nginx"
 
 rm -rf /usr/share/nginx/html/* &>>LOG_FILE
 VALIDATE $? "removing default content"
