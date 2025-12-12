@@ -79,7 +79,13 @@ VALIDATE $? "copying mongodb repo"
 dnf install mongodb-mongosh -y &>>LOG_FILE
 VALIDATE $? "installing mongodb client"
 
-mongosh --host mongodb.miasha84s.site </app/db/master-data.js &>>LOG_FILE
-VALIDATE $? "loading data into mongodb"
+STATUS=$(mongosh --host mongodb.miasha84s.site --eval 'db.getMongo().getDBNames().indexOf("catalogue")')
+if [ $STATUS -ne 0]
+then
+    mongosh --host mongodb.miasha84s.site </app/db/master-data.js &>>LOG_FILE
+    VALIDATE $? "loading data into mongodb"
+else
+    echo -e "date loaded already.. $YSKIPPING$N"
 
+done
 
