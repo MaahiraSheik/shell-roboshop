@@ -86,6 +86,5 @@ then
     VALIDATE $? "loading data into mongodb"
 else
     echo -e "date loaded already.. $YSKIPPING$N"
-
 done
 
