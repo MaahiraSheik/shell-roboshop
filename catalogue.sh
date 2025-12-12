@@ -62,7 +62,7 @@ cd /app
 npm install &>>LOG_FILE
 VALIDATE $? "Installing dependencies"
 
-cp SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service
+cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service
 VALIDATE $? "copying Catalogue service"
 
 systemctl daemon-reload &>>LOG_FILE
