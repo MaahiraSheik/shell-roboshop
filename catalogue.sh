@@ -55,7 +55,7 @@ VALIDATE $? "Downloading the catalogue"
 
 rm -rf /app/*
 cd /app 
-unzip /tmp/catalogue.zip
+unzip /tmp/catalogue.zip &>>LOG_FILE
 VALIDATE $? "Unzipping the catalogue"
 
 cd /app 
@@ -80,11 +80,11 @@ dnf install mongodb-mongosh -y &>>LOG_FILE
 VALIDATE $? "installing mongodb client"
 
 STATUS=$(mongosh --host mongodb.miasha84s.site --eval 'db.getMongo().getDBNames().indexOf("catalogue")')
-if [ $STATUS -ne 0]
+if [ $STATUS -lt 0]
 then
     mongosh --host mongodb.miasha84s.site </app/db/master-data.js &>>LOG_FILE
     VALIDATE $? "loading data into mongodb"
 else
     echo -e "date loaded already.. $YSKIPPING$N"
-done
+fi
 
