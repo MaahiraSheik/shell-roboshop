@@ -85,6 +85,6 @@ then
     mongosh --host mongodb.miasha84s.site </app/db/master-data.js &>>LOG_FILE
     VALIDATE $? "loading data into mongodb"
 else
-    echo -e "date loaded already.. $YSKIPPING$N"
+    echo -e "date loaded already.. $Y SKIPPING $N"
 fi
 
