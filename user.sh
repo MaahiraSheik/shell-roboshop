@@ -32,48 +32,48 @@ VALIDATE(){
   fi
 }
 
-dnf module disable nodejs -y &>>LOG_FILE
+dnf module disable nodejs -y &>>$LOG_FILE
 VALIDATE $? "Disabling Default nodeje:20"
 
-dnf module enable nodejs:20 -y &>>LOG_FILE
+dnf module enable nodejs:20 -y &>>$LOG_FILE
 VALIDATE $? "enabling nodejs:20"
 
-dnf install nodejs -y &>>LOG_FILE
+dnf install nodejs -y &>>$LOG_FILE
 VALIDATE $? "Installling Nodejs:20"
 
 id roboshop
 if [ $? -ne 0 ]
 then
-useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop
+useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOG_FILE
 VALIDATE $? "Create Sytem User"
 else
-echo -e "system user roboshop already created...$YSKIPPING..$N"
+echo -e "system user roboshop already created...$Y SKIPPING..$N"
 fi
 
 mkdir -p /app &>>LOG_FILE
 VALIDATE $? "creating App directory"
 
-curl -o /tmp/user.zip https://roboshop-artifacts.s3.amazonaws.com/user-v3.zip 
+curl -o /tmp/user.zip https://roboshop-artifacts.s3.amazonaws.com/user-v3.zip &>>$LOG_FILE
 VALIDATE $? "Downloading the user"
 
 rm -rf /app/*
 cd /app 
-unzip /tmp/user.zip &>>LOG_FILE
+unzip /tmp/user.zip &>>$LOG_FILE
 VALIDATE $? "Unzipping the user"
 
 cd /app 
-npm install &>>LOG_FILE
+npm install &>>$LOG_FILE
 VALIDATE $? "Installing dependencies"
 
 cp $SCRIPT_DIR/user.service /etc/systemd/system/user.service
 VALIDATE $? "copying user service"
 
-systemctl daemon-reload &>>LOG_FILE
+systemctl daemon-reload &>>$LOG_FILE
 VALIDATE $? "daemon reload"
 
-systemctl enable user  &>>LOG_FILE
+systemctl enable user  &>>$LOG_FILE
 VALIDATE $? "enable user reload"
-systemctl start user &>>LOG_FILE
+systemctl start user &>>$LOG_FILE
 VALIDATE $? "start user reload"
 
 END_TIME=$(date +%s)
