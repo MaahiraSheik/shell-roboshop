@@ -32,14 +32,8 @@ VALIDATE(){
   fi
 }
 
-dnf module disable nodejs -y &>>$LOG_FILE
-VALIDATE $? "Disabling Default nodeje:20"
-
-dnf module enable nodejs:20 -y &>>$LOG_FILE
-VALIDATE $? "enabling nodejs:20"
-
-dnf install nodejs -y &>>$LOG_FILE
-VALIDATE $? "Installling Nodejs:20"
+dnf install python3 gcc python3-devel -y &>>$LOG_FILE
+VALIDATE $? "install python3"
 
 id roboshop
 if [ $? -ne 0 ]
@@ -50,31 +44,31 @@ else
 echo -e "system user roboshop already created...$Y SKIPPING..$N"
 fi
 
-mkdir -p /app &>>$LOG_FILE
+mkdir -p /app &>>LOG_FILE
 VALIDATE $? "creating App directory"
 
-curl -o /tmp/cart.zip https://roboshop-artifacts.s3.amazonaws.com/cart-v3.zip 
-VALIDATE $? "Downloading the cart"
+curl -o /tmp/payment.zip https://roboshop-artifacts.s3.amazonaws.com/payment-v3.zip &>>$LOG_FILE
+VALIDATE $? "Downloading the payment"
 
 rm -rf /app/*
 cd /app 
-unzip /tmp/cart.zip &>>$LOG_FILE
-VALIDATE $? "Unzipping the cart"
+unzip /tmp/payment.zip &>>$LOG_FILE
+VALIDATE $? "Unzipping the payment"
 
-cd /app 
-npm install &>>$LOG_FILE
-VALIDATE $? "Installing dependencies"
+pip3 install -r requirements.txt &>>$LOG_FILE
+VALIDATE $? "install dependencies"
 
-cp $SCRIPT_DIR/cart.service /etc/systemd/system/cart.service
-VALIDATE $? "copying cart service"
+cp payment.service /etc/systemd/system/payment.service &>>$LOG_FILE
+VALIDATE $? "copying payment service"
 
 systemctl daemon-reload &>>$LOG_FILE
 VALIDATE $? "daemon reload"
 
-systemctl enable cart  &>>$LOG_FILE
-VALIDATE $? "enable cart reload"
-systemctl start cart &>>$LOG_FILE
-VALIDATE $? "start cart reload"
+systemctl enable payment &>>$LOG_FILE
+VALIDATE $? "enabling the payment"
+
+systemctl start payment &>>$LOG_FILE
+VALIDATE $? "starting the payment"
 
 END_TIME=$(date +%s)
 TOTAL_TIME=$(( $END_TIME - $START_TIME ))
