@@ -1,6 +1,6 @@
 #!/bin/bash
 
-AMI_ID="ami-09c813fb71547fc4f"
+AMI_ID="ami-0220d79f3f480ecf5"
 SG_ID="sg-074bbf13eb04da445" # replace with your SG ID
 #INSTANCES=("cart" "user" "redis" )
 ZONE_ID="Z03411543BSLBE0GBV4TS" # replace with your ZONE ID
